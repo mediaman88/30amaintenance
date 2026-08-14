@@ -7,8 +7,10 @@
  */
 
 export const site = {
-  name: "30A Maintenance",
-  legalName: "30A Maintenance", // TODO: your registered LLC / DBA name
+  name: "30A Maintenance & Remodeling",
+  // Short form for tight spots like the header logo.
+  shortName: "30A Maintenance",
+  legalName: "30A Maintenance & Remodeling LLC",
   tagline: "Remodeling & Property Maintenance on Scenic 30A",
   description:
     "Remodeling, repairs, and year-round property maintenance for homes and vacation rentals along Scenic Highway 30A and South Walton, Florida.",
@@ -18,11 +20,11 @@ export const site = {
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://30amaintenance.com", // TODO: confirm domain
 
   contact: {
-    phone: "(850) 555-0134", // TODO: real phone
-    phoneHref: "tel:+18505550134", // TODO: real phone, E.164 format
-    email: "hello@30amaintenance.com", // TODO: real email
+    phone: "(850) 960-2594",
+    phoneHref: "tel:+18509602594",
+    email: "", // TODO: real email — leave "" and the site shows the phone only
     // Where the contact form sends to. Falls back to contact.email.
-    formRecipient: "hello@30amaintenance.com", // TODO
+    formRecipient: "", // TODO
   },
 
   social: {
@@ -31,21 +33,31 @@ export const site = {
     facebook: "", // optional — leave "" to hide
   },
 
-  // Service area. Drives the footer, the local-business schema, and SEO copy.
+  // Matches the Google Business Profile listing. Keep name, address and phone
+  // identical across the site, Google, and Instagram — search engines treat
+  // mismatches as different businesses and it costs you local ranking.
   location: {
-    // A physical street address improves local SEO, but only list one you
-    // actually operate from. Leave street blank to publish as a service-area
-    // business (recommended for mobile contractors).
-    street: "",
-    city: "Santa Rosa Beach",
+    street: "19228 US-331",
+    city: "Freeport",
     region: "FL",
     regionName: "Florida",
-    postalCode: "32459", // TODO: confirm
+    postalCode: "32439",
     country: "US",
-    // Approximate center of the service area (Santa Rosa Beach, FL).
-    latitude: 30.3652,
-    longitude: -86.2233,
+    // Approximate — fine for schema. For an exact pin, grab the coordinates
+    // from the Google Maps URL for the business.
+    latitude: 30.4972,
+    longitude: -86.1344,
     serviceRadiusMiles: 30,
+  },
+
+  // Google Business Profile rating. Update as reviews come in.
+  // Set show: false to hide the badge entirely.
+  googleRating: {
+    show: true,
+    rating: 5.0,
+    count: 2,
+    // TODO: paste the "write a review" / profile link from your Google listing
+    url: "",
   },
 
   areasServed: [
@@ -61,11 +73,14 @@ export const site = {
     "Dune Allen",
     "Watersound",
     "Miramar Beach",
+    "Freeport",
   ],
 
   hours: {
-    weekdays: "Mon–Fri, 7:30am – 5:00pm",
-    saturday: "Sat, by appointment",
+    weekdays: "Mon–Fri, 8:00am – 5:00pm",
+    // TODO: confirm the Saturday closing time — the Google listing shows an
+    // 8:00am open but the close time wasn't visible.
+    saturday: "Sat, from 8:00am",
     sunday: "Sun, closed",
     // Shown in the "urgent" callout. Set to "" to hide that callout.
     emergencyNote: "Rental turnover emergency? Call and we'll work you in.",

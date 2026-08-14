@@ -79,22 +79,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ errors }, { status: 422 });
   }
 
-  const to = site.contact.formRecipient || site.contact.email;
+  // CONTACT_TO_EMAIL lets you change the recipient in Vercel without a code
+  // change; site.config.ts is the fallback.
+  const to =
+    process.env.CONTACT_TO_EMAIL ||
+    site.contact.formRecipient ||
+    site.contact.email;
   const apiKey = process.env.RESEND_API_KEY;
   const from = process.env.CONTACT_FROM_EMAIL;
 
-  // Not wired to an email provider yet — tell the client so it can show the
-  // direct email address instead of pretending the message was delivered.
-  if (!apiKey || !from) {
+  // Not wired to an email provider yet — tell the client so it can point the
+  // visitor somewhere real instead of pretending the message was delivered.
+  if (!apiKey || !from || !to) {
     console.warn(
-      "[contact] RESEND_API_KEY / CONTACT_FROM_EMAIL not set — message not sent.",
+      "[contact] Email not configured (need RESEND_API_KEY, CONTACT_FROM_EMAIL, and a recipient) — message not sent.",
       { name, email, phone, service },
     );
     return NextResponse.json(
-      {
-        error: "not_configured",
-        fallbackEmail: to,
-      },
+      { error: "not_configured", fallbackEmail: to || null },
       { status: 503 },
     );
   }

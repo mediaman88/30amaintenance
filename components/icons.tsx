@@ -83,6 +83,35 @@ export function ClockIcon({ className }: Props) {
   );
 }
 
+/** Five stars, filled to match a rating. Decorative — the numeric rating is
+ *  always rendered as text next to it, so this carries no extra meaning. */
+export function Stars({
+  rating,
+  className = "h-4 w-4",
+}: {
+  rating: number;
+  className?: string;
+}) {
+  return (
+    <span className="flex gap-0.5" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <svg
+          key={n}
+          viewBox="0 0 24 24"
+          className={className}
+          fill={n <= Math.round(rating) ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth={1.6}
+          strokeLinejoin="round"
+          style={{ color: "var(--color-sun-400)" }}
+        >
+          <path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" />
+        </svg>
+      ))}
+    </span>
+  );
+}
+
 /* ── Service icons ──────────────────────────────────────────────────────── */
 
 const serviceIcons: Record<IconName, React.ReactNode> = {

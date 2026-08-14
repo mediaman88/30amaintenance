@@ -14,7 +14,7 @@ export default function Footer() {
             <div className="flex items-center gap-2.5">
               <Logo className="h-9 w-9 text-gulf-400" />
               <span className="text-lg font-semibold text-sand-50">
-                {site.name}
+                {site.shortName}
               </span>
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-sand-100/65">
@@ -86,13 +86,21 @@ export default function Footer() {
                   {site.contact.phone}
                 </a>
               </li>
-              <li>
-                <a
-                  href={`mailto:${site.contact.email}`}
-                  className="text-sand-100/70 transition-colors hover:text-sand-50"
-                >
-                  {site.contact.email}
-                </a>
+              {site.contact.email && (
+                <li>
+                  <a
+                    href={`mailto:${site.contact.email}`}
+                    className="text-sand-100/70 transition-colors hover:text-sand-50"
+                  >
+                    {site.contact.email}
+                  </a>
+                </li>
+              )}
+              <li className="text-sand-100/70">
+                {site.location.street}
+                <br />
+                {site.location.city}, {site.location.region}{" "}
+                {site.location.postalCode}
               </li>
               <li className="pt-2 text-sand-100/60">
                 <div>{site.hours.weekdays}</div>

@@ -46,7 +46,7 @@ function LocalBusinessSchema() {
     description: site.description,
     url: site.url,
     telephone: site.contact.phone,
-    email: site.contact.email,
+    ...(site.contact.email ? { email: site.contact.email } : {}),
     image: `${site.url}/og.png`,
     address: {
       "@type": "PostalAddress",
@@ -68,6 +68,15 @@ function LocalBusinessSchema() {
     })),
     sameAs: [site.social.instagram, site.social.facebook].filter(Boolean),
   };
+
+  // Only publish a rating when there are real reviews behind it.
+  if (site.googleRating.show && site.googleRating.count > 0) {
+    schema.aggregateRating = {
+      "@type": "AggregateRating",
+      ratingValue: site.googleRating.rating,
+      reviewCount: site.googleRating.count,
+    };
+  }
 
   return (
     <script

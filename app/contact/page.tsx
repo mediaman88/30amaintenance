@@ -55,20 +55,24 @@ export default function ContactPage() {
                     </p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3">
-                  <MailIcon className="mt-0.5 h-4.5 w-4.5 shrink-0 text-gulf-600" />
-                  <a
-                    href={`mailto:${site.contact.email}`}
-                    className="break-all text-ink-800/80 transition-colors hover:text-gulf-700"
-                  >
-                    {site.contact.email}
-                  </a>
-                </li>
+                {site.contact.email && (
+                  <li className="flex items-start gap-3">
+                    <MailIcon className="mt-0.5 h-4.5 w-4.5 shrink-0 text-gulf-600" />
+                    <a
+                      href={`mailto:${site.contact.email}`}
+                      className="break-all text-ink-800/80 transition-colors hover:text-gulf-700"
+                    >
+                      {site.contact.email}
+                    </a>
+                  </li>
+                )}
                 <li className="flex items-start gap-3">
                   <MapPinIcon className="mt-0.5 h-4.5 w-4.5 shrink-0 text-gulf-600" />
                   <div className="text-ink-800/80">
+                    <p>{site.location.street}</p>
                     <p>
-                      {site.location.city}, {site.location.region}
+                      {site.location.city}, {site.location.region}{" "}
+                      {site.location.postalCode}
                     </p>
                     <p className="mt-0.5 text-ink-800/55">
                       Serving all of Scenic 30A &amp; South Walton

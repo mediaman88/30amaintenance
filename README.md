@@ -91,6 +91,11 @@ because the photos are already in the repo by the time you deploy.
 This gets **every photo you've ever posted**, including old ones, with captions
 and dates, and needs no developer account at all.
 
+> **Handing this off to someone non-technical?**
+> `docs/instagram-export-guide.html` is a plain-English, phone-first walkthrough
+> of steps 1–3 below, written for the account owner rather than a developer.
+> Open it in a browser or send them the published link.
+
 1. In the Instagram app: **Settings → Accounts Centre → Your information and
    permissions → Download your information**.
 2. Request a download of **Posts**, format **JSON**, quality **High**.

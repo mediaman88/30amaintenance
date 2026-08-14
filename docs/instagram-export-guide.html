@@ -1,0 +1,555 @@
+<title>Instagram Photo Export</title>
+<style>
+  /* ── Tokens ──────────────────────────────────────────────────────────
+     Light is the base. Dark is redefined twice: once for the un-stamped
+     system-dark case, once for an explicit toggle. Components only ever
+     read tokens, never literals. */
+  :root {
+    --ground: #fffdf8;
+    --surface: #ffffff;
+    --surface-sunk: #f7f2e8;
+    --ink: #16272d;
+    --ink-soft: #4a5c63;
+    --ink-faint: #7d8b90;
+    --rule: #e4ddcf;
+    --rule-strong: #cfc5b1;
+    --gulf: #106674;
+    --gulf-bright: #14808f;
+    --gulf-wash: #e6f2f3;
+    /* Text sitting ON a --gulf fill. Flips with the theme because --gulf
+       goes from dark teal (light mode) to bright teal (dark mode). */
+    --on-gulf: #fffdf8;
+    --alert: #b06a0d;
+    --alert-wash: #fdf3e2;
+    --alert-rule: #e8c48a;
+    --shadow: 0 1px 2px rgb(22 39 45 / 0.05), 0 10px 24px -14px rgb(22 39 45 / 0.3);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #0e171b;
+      --surface: #16232a;
+      --surface-sunk: #1b2b32;
+      --ink: #eef4f3;
+      --ink-soft: #b0c1c4;
+      --ink-faint: #7e9297;
+      --rule: #263840;
+      --rule-strong: #375059;
+      --gulf: #4fb8c6;
+      --gulf-bright: #6ecedb;
+      --gulf-wash: #12313a;
+      --on-gulf: #0e171b;
+      --alert: #e8b35f;
+      --alert-wash: #33260f;
+      --alert-rule: #6b5220;
+      --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 24px -14px rgb(0 0 0 / 0.7);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --ground: #0e171b;
+    --surface: #16232a;
+    --surface-sunk: #1b2b32;
+    --ink: #eef4f3;
+    --ink-soft: #b0c1c4;
+    --ink-faint: #7e9297;
+    --rule: #263840;
+    --rule-strong: #375059;
+    --gulf: #4fb8c6;
+    --gulf-bright: #6ecedb;
+    --gulf-wash: #12313a;
+    --on-gulf: #0e171b;
+    --alert: #e8b35f;
+    --alert-wash: #33260f;
+    --alert-rule: #6b5220;
+    --shadow: 0 1px 2px rgb(0 0 0 / 0.3), 0 10px 24px -14px rgb(0 0 0 / 0.7);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+      "Helvetica Neue", Arial, sans-serif;
+    /* Deliberately large: this is read on a phone, mid-task, by someone who
+       does not want to squint. */
+    font-size: 18px;
+    line-height: 1.6;
+    -webkit-text-size-adjust: 100%;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap {
+    max-width: 34rem;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 5rem;
+  }
+
+  /* ── Masthead ──────────────────────────────────────────────────────── */
+  .eyebrow {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--gulf);
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(2rem, 8vw, 2.6rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-weight: 700;
+    text-wrap: balance;
+    margin: 0.6rem 0 0;
+  }
+
+  .standfirst {
+    font-size: 1.06rem;
+    color: var(--ink-soft);
+    margin: 1rem 0 0;
+    text-wrap: pretty;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.5rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .meta li {
+    background: var(--surface-sunk);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.35rem 0.85rem;
+    font-size: 0.83rem;
+    color: var(--ink-soft);
+  }
+
+  hr {
+    border: 0;
+    border-top: 1px solid var(--rule);
+    margin: 2.5rem 0;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
+    margin: 0 0 1rem;
+    text-wrap: balance;
+  }
+
+  p { margin: 0 0 1rem; text-wrap: pretty; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── Steps ─────────────────────────────────────────────────────────────
+     Numbering is load-bearing here: this is a literal tap sequence and the
+     order is the information. */
+  .steps {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    counter-reset: step;
+  }
+
+  .steps > li {
+    counter-increment: step;
+    position: relative;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 1.1rem 1.1rem 1.1rem 3.9rem;
+    box-shadow: var(--shadow);
+  }
+
+  .steps > li::before {
+    content: counter(step);
+    position: absolute;
+    left: 1rem;
+    top: 1rem;
+    width: 2.1rem;
+    height: 2.1rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--gulf);
+    color: var(--on-gulf);
+    font-size: 1rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .steps h3 {
+    margin: 0 0 0.3rem;
+    font-size: 1.06rem;
+    line-height: 1.35;
+    font-weight: 650;
+  }
+
+  .steps p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  .steps p + p { margin-top: 0.5rem; }
+
+  /* A word you tap on screen. */
+  .tap {
+    display: inline-block;
+    background: var(--gulf-wash);
+    color: var(--gulf);
+    border: 1px solid color-mix(in srgb, var(--gulf) 25%, transparent);
+    border-radius: 7px;
+    padding: 0.05em 0.45em;
+    font-weight: 650;
+    font-size: 0.94em;
+    white-space: nowrap;
+  }
+
+  /* ── Callouts ──────────────────────────────────────────────────────── */
+  .critical {
+    background: var(--alert-wash);
+    border: 1px solid var(--alert-rule);
+    border-radius: 14px;
+    padding: 1.35rem;
+    margin: 2rem 0;
+  }
+
+  .critical h2 {
+    color: var(--alert);
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .critical .warnmark {
+    flex: none;
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .settings {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .settings li {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 0.8rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .settings .k { color: var(--ink-soft); font-size: 0.92rem; }
+  .settings .v { font-weight: 700; color: var(--ink); }
+
+  .note {
+    background: var(--surface-sunk);
+    border-left: 3px solid var(--gulf);
+    border-radius: 0 10px 10px 0;
+    padding: 0.9rem 1.1rem;
+    margin: 1.5rem 0;
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+  }
+
+  .note strong { color: var(--ink); }
+
+  .finish {
+    background: var(--gulf-wash);
+    border: 1px solid color-mix(in srgb, var(--gulf) 25%, transparent);
+    border-radius: 14px;
+    padding: 1.5rem;
+    margin-top: 1rem;
+  }
+
+  .finish h2 { color: var(--gulf); margin-bottom: 0.6rem; }
+
+  ul.plain { padding-left: 1.15rem; margin: 0.75rem 0 0; }
+  ul.plain li { margin-bottom: 0.5rem; color: var(--ink-soft); }
+  ul.plain li:last-child { margin-bottom: 0; }
+  ul.plain strong { color: var(--ink); }
+
+  .faq { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  details {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 12px;
+    padding: 0.9rem 1.1rem;
+  }
+
+  summary {
+    cursor: pointer;
+    font-weight: 650;
+    font-size: 0.98rem;
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  summary::-webkit-details-marker { display: none; }
+
+  summary::after {
+    content: "+";
+    color: var(--gulf);
+    font-size: 1.3rem;
+    font-weight: 400;
+    line-height: 1;
+    flex: none;
+  }
+
+  details[open] summary::after { content: "–"; }
+
+  details p {
+    margin: 0.75rem 0 0;
+    font-size: 0.94rem;
+    color: var(--ink-soft);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--gulf-bright);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.86rem;
+    color: var(--ink-faint);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header>
+    <p class="eyebrow">30A Maintenance &amp; Remodeling</p>
+    <h1>Getting your Instagram photos onto the website</h1>
+    <p class="standfirst">
+      Instagram can send you a copy of every photo you've ever posted. You
+      request it on your phone, Meta emails you a file, and you pass that file
+      along. That's the whole job.
+    </p>
+    <ul class="meta">
+      <li>About 3 minutes of tapping</li>
+      <li>Then a wait for the email</li>
+      <li>Phone only — no computer needed</li>
+    </ul>
+  </header>
+
+  <hr />
+
+  <h2>Do this part on your phone</h2>
+  <p style="color: var(--ink-soft); font-size: 0.97rem;">
+    Open the Instagram app and sign in as <strong>@30a.maintenance</strong> if
+    you aren't already.
+  </p>
+
+  <ol class="steps">
+    <li>
+      <h3>Open your profile</h3>
+      <p>Tap your profile picture in the bottom-right corner of the screen.</p>
+    </li>
+    <li>
+      <h3>Open the menu</h3>
+      <p>Tap the three stacked lines <span class="tap">☰</span> in the top-right corner.</p>
+    </li>
+    <li>
+      <h3>Tap <span class="tap">Settings and privacy</span></h3>
+      <p>It's usually the first item in the list. On some versions it just says <span class="tap">Settings</span>.</p>
+    </li>
+    <li>
+      <h3>Tap <span class="tap">Accounts Center</span></h3>
+      <p>It sits near the very top, under a heading about Meta. If you don't see it, scroll to the bottom and look for <span class="tap">Accounts Center</span> there.</p>
+    </li>
+    <li>
+      <h3>Tap <span class="tap">Your information and permissions</span></h3>
+    </li>
+    <li>
+      <h3>Tap <span class="tap">Download your information</span></h3>
+    </li>
+    <li>
+      <h3>Tap <span class="tap">Download or transfer information</span></h3>
+      <p>If it asks which account, pick <strong>30a.maintenance</strong>, then tap <span class="tap">Next</span>.</p>
+    </li>
+    <li>
+      <h3>Choose <span class="tap">Some of your information</span></h3>
+      <p>Then scroll down to the section headed <strong>Your content</strong> and tick the box next to <span class="tap">Posts</span>.</p>
+      <p>That's the only box you need. Tap <span class="tap">Next</span>.</p>
+    </li>
+    <li>
+      <h3>Choose <span class="tap">Download to device</span></h3>
+    </li>
+    <li>
+      <h3>Set the three options</h3>
+      <p>This is the important screen — see below before tapping anything.</p>
+    </li>
+  </ol>
+
+  <div class="critical">
+    <h2>
+      <svg class="warnmark" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"
+           aria-hidden="true">
+        <path d="M12 3.7 2.6 20h18.8L12 3.7Z" />
+        <path d="M12 10v4.2" />
+        <circle cx="12" cy="17.2" r=".6" fill="currentColor" stroke="none" />
+      </svg>
+      Check these three settings
+    </h2>
+    <p style="color: var(--ink-soft); font-size: 0.95rem;">
+      Everything else on this screen can stay as it is. These three are worth
+      double-checking, because they're the difference between photos we can use
+      and photos we can't.
+    </p>
+    <ul class="settings">
+      <li><span class="k">Date range</span> <span class="v">All time</span></li>
+      <li><span class="k">Format</span> <span class="v">JSON</span></li>
+      <li><span class="k">Media quality</span> <span class="v">High</span></li>
+    </ul>
+    <p style="margin-top: 1rem; font-size: 0.93rem; color: var(--ink-soft);">
+      <strong style="color: var(--ink);">Format: JSON</strong> is the one people
+      get wrong. The other option, HTML, gives us the photos but throws away
+      your captions.
+      <strong style="color: var(--ink);">Media quality: High</strong> matters
+      because the lower setting shrinks your photos, and they look soft and
+      blurry blown up on a website.
+    </p>
+  </div>
+
+  <ol class="steps" start="11" style="counter-reset: step 10;">
+    <li>
+      <h3>Tap <span class="tap">Create files</span></h3>
+      <p>That's you done for now. Instagram takes it from here.</p>
+    </li>
+  </ol>
+
+  <hr />
+
+  <h2>What happens next</h2>
+  <p>
+    Meta puts the file together in the background and emails you when it's
+    ready. It usually takes a few hours. Occasionally it takes a day or two — if
+    you've posted a lot of photos, it takes longer.
+  </p>
+  <div class="note">
+    <strong>You can close Instagram.</strong> You don't have to keep the app
+    open or the phone awake. The email will come whether or not you're looking.
+  </div>
+
+  <h2>When the email arrives</h2>
+  <p>
+    It comes from Meta or Instagram with a subject line about your information
+    being ready. Open it and tap the download button. You'll be asked to log in
+    again — that's normal, it's checking it's really you.
+  </p>
+  <p>
+    You'll end up with a <strong>.zip file</strong>. Don't open it, don't unzip
+    it, don't rename it. Just leave it as it is.
+  </p>
+  <div class="note">
+    <strong>Don't sit on it too long.</strong> The download link expires after a
+    few days. If you miss the window, no harm done — just run through the steps
+    again.
+  </div>
+
+  <div class="finish">
+    <h2>Last step: send the file over</h2>
+    <p style="color: var(--ink-soft);">
+      The zip is usually too big to email. Any of these work:
+    </p>
+    <ul class="plain">
+      <li><strong>Google Drive or Dropbox</strong> — upload it, then share the link.</li>
+      <li><strong>WeTransfer</strong> — free, no account needed, made for exactly this.</li>
+      <li><strong>AirDrop</strong> — if you're both on iPhones and in the same room.</li>
+      <li><strong>Text message</strong> — worth a try, but it'll likely be too large.</li>
+    </ul>
+    <p style="margin-top: 1rem; color: var(--ink-soft);">
+      Once it's sent, you're finished. Every photo goes up on the website from
+      there.
+    </p>
+  </div>
+
+  <hr />
+
+  <h2>If something looks different</h2>
+  <div class="faq">
+    <details>
+      <summary>The menus don't match what's written here</summary>
+      <p>
+        Instagram rearranges these screens every so often. The wording tends to
+        survive even when the layout changes, so look for the phrases
+        <strong>"Accounts Center"</strong>, then
+        <strong>"Your information and permissions"</strong>, then
+        <strong>"Download your information"</strong>. Following those three
+        phrases will get you there from almost any version of the app.
+      </p>
+    </details>
+    <details>
+      <summary>I can't find Accounts Center anywhere</summary>
+      <p>
+        Try scrolling all the way to the bottom of the Settings screen — on some
+        versions it sits at the end rather than the top. Failing that, you can
+        do the whole thing on a computer at
+        <strong>accountscenter.instagram.com</strong>, where the same options
+        appear under "Your information and permissions".
+      </p>
+    </details>
+    <details>
+      <summary>I already tapped through and picked the wrong settings</summary>
+      <p>
+        Not a problem. Nothing is lost and there's no limit on requests — just
+        start again from step 1 and request a new one. The wrong file can be
+        ignored.
+      </p>
+    </details>
+    <details>
+      <summary>It's asking me to pick between accounts</summary>
+      <p>
+        Choose <strong>30a.maintenance</strong>. If a personal Instagram or a
+        Facebook page is linked to the same login, they'll show up in the same
+        list — you only want the business account.
+      </p>
+    </details>
+    <details>
+      <summary>How long is this going to take?</summary>
+      <p>
+        The tapping is about three minutes. The wait for the email is a few
+        hours, sometimes longer. You don't have to do anything during the wait.
+      </p>
+    </details>
+  </div>
+
+  <footer>
+    Any trouble at all, stop and send a screenshot of whatever's on your screen
+    — much easier to sort out that way than guessing.
+  </footer>
+</div>

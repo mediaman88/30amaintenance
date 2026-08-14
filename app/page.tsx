@@ -7,6 +7,7 @@ import {
   CheckIcon,
   InstagramIcon,
   ServiceIcon,
+  Stars,
 } from "@/components/icons";
 
 export default function HomePage() {
@@ -79,18 +80,25 @@ export default function HomePage() {
               </a>
             </div>
 
-            <ul className="mt-10 flex flex-wrap gap-x-7 gap-y-3 text-sm text-sand-100/70">
-              {[
-                "Licensed & insured",
-                "Free written estimates",
-                "Local, year-round crew",
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-2">
-                  <CheckIcon className="h-4 w-4 shrink-0 text-gulf-400" />
-                  {item}
-                </li>
-              ))}
-            </ul>
+            <div className="mt-10 flex flex-wrap items-center gap-x-7 gap-y-3 text-sm text-sand-100/70">
+              {site.googleRating.show && site.googleRating.count > 0 && (
+                <span className="flex items-center gap-2">
+                  <Stars rating={site.googleRating.rating} />
+                  <span className="font-semibold text-sand-50">
+                    {site.googleRating.rating.toFixed(1)}
+                  </span>
+                  on Google ({site.googleRating.count})
+                </span>
+              )}
+              {["Free written estimates", "Local, year-round crew"].map(
+                (item) => (
+                  <span key={item} className="flex items-center gap-2">
+                    <CheckIcon className="h-4 w-4 shrink-0 text-gulf-400" />
+                    {item}
+                  </span>
+                ),
+              )}
+            </div>
           </div>
         </div>
       </section>

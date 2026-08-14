@@ -53,11 +53,11 @@ export default function Header() {
         >
           <Logo className="h-9 w-9 shrink-0 text-gulf-600" />
           <span className="flex flex-col leading-none">
-            <span className="text-lg font-semibold tracking-tight text-ink-900">
-              {site.name}
+            <span className="text-base font-semibold tracking-tight text-ink-900 sm:text-lg">
+              {site.shortName}
             </span>
             <span className="mt-0.5 text-[0.68rem] font-medium uppercase tracking-[0.14em] text-gulf-600">
-              Santa Rosa Beach, FL
+              Remodeling &amp; Repairs · 30A
             </span>
           </span>
         </Link>

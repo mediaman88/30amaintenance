@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { services } from "@/site.config";
+import { services, site } from "@/site.config";
 import { ArrowIcon, CheckIcon } from "./icons";
 
 type Status = "idle" | "sending" | "sent";
@@ -50,10 +50,16 @@ export default function ContactForm() {
       }
 
       if (body.error === "not_configured" || body.error === "send_failed") {
-        setNotice({
-          text: "We couldn't send that automatically. Please email us directly and we'll get right back to you:",
-          email: body.fallbackEmail,
-        });
+        setNotice(
+          body.fallbackEmail
+            ? {
+                text: "We couldn't send that automatically. Please email us directly and we'll get right back to you:",
+                email: body.fallbackEmail,
+              }
+            : {
+                text: `We couldn't send that automatically. Please call us at ${site.contact.phone} and we'll get right back to you.`,
+              },
+        );
         return;
       }
 
