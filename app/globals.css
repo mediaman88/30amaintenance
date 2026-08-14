@@ -1,36 +1,39 @@
 @import "tailwindcss";
 
 @theme {
-  /* Coastal palette — deep gulf water, weathered sand, late-afternoon sun. */
-  --color-ink-950: #071a20;
-  --color-ink-900: #0c2831;
-  --color-ink-800: #123a46;
-  --color-ink-700: #1a4e5d;
+  /* ── Brand palette, taken from the logo ────────────────────────────────
+     Navy carries the page and every piece of text; gold is the accent and
+     is reserved for fills, marks, and the primary call to action. Gold is
+     never used for body text — at brand strength it can't hold contrast
+     on a light ground. */
+  --color-navy-950: #0b0e2a;
+  --color-navy-900: #161a45; /* the logo navy */
+  --color-navy-800: #232a63;
+  --color-navy-700: #333b7d;
+  --color-navy-600: #4750a0;
 
-  --color-gulf-50: #eff9fa;
-  --color-gulf-100: #d6f0f3;
-  --color-gulf-200: #b0e2e8;
-  --color-gulf-400: #4bb6c4;
-  --color-gulf-500: #2b96a6;
-  --color-gulf-600: #1d7a89;
-  --color-gulf-700: #1a6270;
+  --color-gold-50: #fef8e7;
+  --color-gold-100: #fcefc6;
+  --color-gold-200: #f8de8e;
+  --color-gold-300: #f4cb55;
+  --color-gold-400: #efb01f; /* the logo gold */
+  --color-gold-500: #dfa015;
+  --color-gold-600: #b87f0c;
+  --color-gold-700: #8a5d07; /* dark enough for text on white */
 
-  --color-sand-50: #fbf8f3;
-  --color-sand-100: #f5efe4;
-  --color-sand-200: #e9dfcd;
-  --color-sand-300: #d8c9ae;
-
-  --color-sun-400: #eab24f;
-  --color-sun-500: #dd9a2b;
-  --color-sun-600: #bd7d18;
+  /* Neutrals biased very slightly toward the navy, so they read as chosen
+     rather than as default greys. */
+  --color-paper-50: #fbfbfd;
+  --color-paper-100: #f3f4f9;
+  --color-paper-200: #e6e8f1;
+  --color-paper-300: #d2d6e5;
 
   --font-sans:
     ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, sans-serif;
-  --font-display: ui-serif, Georgia, Cambria, "Times New Roman", serif;
 
-  --shadow-lift: 0 1px 2px rgb(7 26 32 / 0.06), 0 12px 28px -12px rgb(7 26 32 / 0.18);
-  --shadow-lift-lg: 0 2px 4px rgb(7 26 32 / 0.06), 0 24px 48px -20px rgb(7 26 32 / 0.28);
+  --shadow-lift: 0 1px 2px rgb(11 14 42 / 0.06), 0 12px 28px -12px rgb(11 14 42 / 0.2);
+  --shadow-lift-lg: 0 2px 4px rgb(11 14 42 / 0.06), 0 24px 48px -20px rgb(11 14 42 / 0.3);
 }
 
 @layer base {
@@ -40,21 +43,21 @@
   }
 
   body {
-    background-color: var(--color-sand-50);
-    color: var(--color-ink-900);
+    background-color: var(--color-paper-50);
+    color: var(--color-navy-900);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
   }
 
   /* Visible focus for keyboard users, invisible for mouse users. */
   :focus-visible {
-    outline: 2px solid var(--color-gulf-600);
+    outline: 2px solid var(--color-navy-700);
     outline-offset: 3px;
     border-radius: 3px;
   }
 
   ::selection {
-    background-color: var(--color-gulf-200);
+    background-color: var(--color-gold-200);
   }
 }
 

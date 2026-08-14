@@ -41,8 +41,8 @@ export default function Header() {
     <header
       className={`sticky top-0 z-40 transition-all duration-300 ${
         scrolled
-          ? "border-b border-sand-200 bg-sand-50/90 backdrop-blur-md"
-          : "border-b border-transparent bg-sand-50"
+          ? "border-b border-paper-200 bg-paper-50/90 backdrop-blur-md"
+          : "border-b border-transparent bg-paper-50"
       }`}
     >
       <div className="container-page flex h-18 items-center justify-between gap-4 py-3">
@@ -51,12 +51,12 @@ export default function Header() {
           className="flex items-center gap-2.5"
           aria-label={`${site.name} home`}
         >
-          <Logo className="h-9 w-9 shrink-0 text-gulf-600" />
+          <Logo className="h-9 w-9 shrink-0 text-navy-700" />
           <span className="flex flex-col leading-none">
-            <span className="text-base font-semibold tracking-tight text-ink-900 sm:text-lg">
+            <span className="text-base font-semibold tracking-tight text-navy-900 sm:text-lg">
               {site.shortName}
             </span>
-            <span className="mt-0.5 text-[0.68rem] font-medium uppercase tracking-[0.14em] text-gulf-600">
+            <span className="mt-0.5 text-[0.68rem] font-medium uppercase tracking-[0.14em] text-navy-700">
               Remodeling &amp; Repairs · 30A
             </span>
           </span>
@@ -75,8 +75,8 @@ export default function Header() {
                 aria-current={active ? "page" : undefined}
                 className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
                   active
-                    ? "text-gulf-700"
-                    : "text-ink-800/75 hover:bg-sand-100 hover:text-ink-900"
+                    ? "text-navy-800"
+                    : "text-navy-800/75 hover:bg-paper-100 hover:text-navy-900"
                 }`}
               >
                 {item.label}
@@ -88,7 +88,7 @@ export default function Header() {
         <div className="flex items-center gap-2">
           <a
             href={site.contact.phoneHref}
-            className="hidden rounded-full bg-ink-900 px-5 py-2.5 text-sm font-semibold text-sand-50 shadow-lift transition-all hover:bg-ink-800 hover:shadow-lift-lg active:scale-[0.98] sm:inline-flex"
+            className="hidden rounded-full bg-navy-900 px-5 py-2.5 text-sm font-semibold text-paper-50 shadow-lift transition-all hover:bg-navy-800 hover:shadow-lift-lg active:scale-[0.98] sm:inline-flex"
           >
             {site.contact.phone}
           </a>
@@ -96,7 +96,7 @@ export default function Header() {
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
-            className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-lg text-ink-900 transition-colors hover:bg-sand-100 md:hidden"
+            className="-mr-2 inline-flex h-11 w-11 items-center justify-center rounded-lg text-navy-900 transition-colors hover:bg-paper-100 md:hidden"
             aria-expanded={open}
             aria-controls="mobile-menu"
             aria-label={open ? "Close menu" : "Open menu"}
@@ -131,7 +131,7 @@ export default function Header() {
       {open && (
         <div
           id="mobile-menu"
-          className="border-t border-sand-200 bg-sand-50 md:hidden"
+          className="border-t border-paper-200 bg-paper-50 md:hidden"
         >
           <nav className="container-page flex flex-col py-3" aria-label="Mobile">
             {nav.map((item) => {
@@ -146,8 +146,8 @@ export default function Header() {
                   aria-current={active ? "page" : undefined}
                   className={`rounded-lg px-3 py-3.5 text-base font-medium transition-colors ${
                     active
-                      ? "bg-gulf-50 text-gulf-700"
-                      : "text-ink-800 hover:bg-sand-100"
+                      ? "bg-gold-50 text-navy-800"
+                      : "text-navy-800 hover:bg-paper-100"
                   }`}
                 >
                   {item.label}
@@ -156,7 +156,7 @@ export default function Header() {
             })}
             <a
               href={site.contact.phoneHref}
-              className="mt-3 rounded-full bg-ink-900 px-5 py-3.5 text-center text-base font-semibold text-sand-50"
+              className="mt-3 rounded-full bg-navy-900 px-5 py-3.5 text-center text-base font-semibold text-paper-50"
             >
               Call {site.contact.phone}
             </a>

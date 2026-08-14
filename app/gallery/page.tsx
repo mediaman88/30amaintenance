@@ -23,13 +23,13 @@ export default function GalleryPage() {
 
   return (
     <>
-      <section className="border-b border-sand-200 bg-white">
+      <section className="border-b border-paper-200 bg-white">
         <div className="container-page py-16 sm:py-20">
           <div className="max-w-2xl">
-            <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-ink-900 sm:text-5xl">
+            <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight text-navy-900 sm:text-5xl">
               Our work
             </h1>
-            <p className="mt-5 text-pretty text-lg leading-relaxed text-ink-800/70">
+            <p className="mt-5 text-pretty text-lg leading-relaxed text-navy-800/70">
               {photos.length > 0
                 ? `${photos.length} photos from real jobs across 30A — remodels, repairs, turnovers, and everything in between.`
                 : "Photos from real jobs across 30A — remodels, repairs, turnovers, and everything in between."}
@@ -38,9 +38,9 @@ export default function GalleryPage() {
               href={site.social.instagram}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-7 inline-flex items-center gap-2 rounded-full bg-sand-100 px-5 py-2.5 text-sm font-semibold text-ink-900 ring-1 ring-sand-200 transition-colors hover:bg-sand-200"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-paper-100 px-5 py-2.5 text-sm font-semibold text-navy-900 ring-1 ring-paper-200 transition-colors hover:bg-paper-200"
             >
-              <InstagramIcon className="h-4 w-4 text-gulf-600" />
+              <InstagramIcon className="h-4 w-4 text-navy-700" />
               Follow {site.social.instagramHandle}
             </a>
           </div>
@@ -55,7 +55,7 @@ export default function GalleryPage() {
         />
 
         {syncedAt && (
-          <p className="mt-14 text-center text-xs text-ink-800/40">
+          <p className="mt-14 text-center text-xs text-navy-800/40">
             Last synced from Instagram{" "}
             <time dateTime={syncedAt}>
               {new Date(syncedAt).toLocaleDateString("en-US", {

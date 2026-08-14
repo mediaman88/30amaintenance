@@ -95,8 +95,8 @@ export default function GalleryGrid({
                 aria-pressed={selected}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
                   selected
-                    ? "bg-ink-900 text-sand-50 shadow-lift"
-                    : "bg-white text-ink-800/75 ring-1 ring-sand-200 hover:bg-sand-100 hover:text-ink-900"
+                    ? "bg-navy-900 text-paper-50 shadow-lift"
+                    : "bg-white text-navy-800/75 ring-1 ring-paper-200 hover:bg-paper-100 hover:text-navy-900"
                 }`}
               >
                 {category}
@@ -106,7 +106,7 @@ export default function GalleryGrid({
         </div>
       )}
 
-      <p className="mb-6 text-sm text-ink-800/55" aria-live="polite">
+      <p className="mb-6 text-sm text-navy-800/55" aria-live="polite">
         Showing {shown.length} of {filtered.length} photo
         {filtered.length === 1 ? "" : "s"}
       </p>
@@ -117,7 +117,7 @@ export default function GalleryGrid({
             <button
               type="button"
               onClick={() => setLightbox(index)}
-              className="group relative block aspect-square w-full overflow-hidden rounded-xl bg-sand-200 ring-1 ring-sand-200 transition-shadow hover:shadow-lift-lg"
+              className="group relative block aspect-square w-full overflow-hidden rounded-xl bg-paper-200 ring-1 ring-paper-200 transition-shadow hover:shadow-lift-lg"
               aria-label={`Open photo: ${photo.alt}`}
             >
               <Image
@@ -129,7 +129,7 @@ export default function GalleryGrid({
                 // The first row is above the fold on most screens.
                 priority={index < 4}
               />
-              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink-950/75 via-ink-950/0 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+              <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy-950/75 via-navy-950/0 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
               {photo.caption && (
                 <span className="pointer-events-none absolute inset-x-0 bottom-0 line-clamp-2 p-3 text-left text-xs leading-snug text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                   {photo.alt}
@@ -137,7 +137,7 @@ export default function GalleryGrid({
               )}
               {photo.albumSize > 1 && (
                 <span
-                  className="pointer-events-none absolute right-2 top-2 rounded-md bg-ink-950/55 px-1.5 py-0.5 text-[0.65rem] font-semibold text-white backdrop-blur-sm"
+                  className="pointer-events-none absolute right-2 top-2 rounded-md bg-navy-950/55 px-1.5 py-0.5 text-[0.65rem] font-semibold text-white backdrop-blur-sm"
                   aria-hidden="true"
                 >
                   {photo.albumIndex + 1}/{photo.albumSize}
@@ -153,10 +153,10 @@ export default function GalleryGrid({
           <button
             type="button"
             onClick={() => setVisible((v) => v + PAGE_SIZE)}
-            className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-ink-900 shadow-lift ring-1 ring-sand-200 transition-all hover:shadow-lift-lg active:scale-[0.98]"
+            className="inline-flex items-center gap-2 rounded-full bg-white px-7 py-3.5 text-sm font-semibold text-navy-900 shadow-lift ring-1 ring-paper-200 transition-all hover:shadow-lift-lg active:scale-[0.98]"
           >
             Load more photos
-            <span className="text-ink-800/45">
+            <span className="text-navy-800/45">
               ({filtered.length - visible} left)
             </span>
           </button>
@@ -199,7 +199,7 @@ function Lightbox({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/92 p-4 backdrop-blur-sm sm:p-8"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-navy-950/92 p-4 backdrop-blur-sm sm:p-8"
       role="dialog"
       aria-modal="true"
       aria-label={photo.alt}
@@ -251,11 +251,11 @@ function Lightbox({
 
         <figcaption className="w-full max-w-2xl text-center">
           {caption && (
-            <p className="mx-auto max-h-24 overflow-y-auto whitespace-pre-line text-sm leading-relaxed text-sand-100/85">
+            <p className="mx-auto max-h-24 overflow-y-auto whitespace-pre-line text-sm leading-relaxed text-paper-100/85">
               {caption}
             </p>
           )}
-          <div className="mt-3 flex items-center justify-center gap-4 text-xs text-sand-100/50">
+          <div className="mt-3 flex items-center justify-center gap-4 text-xs text-paper-100/50">
             <span>
               {index + 1} of {total}
             </span>
@@ -309,27 +309,27 @@ function NavButton({
  */
 function EmptyState() {
   return (
-    <div className="rounded-2xl border border-dashed border-sand-300 bg-white/60 p-10 text-center">
-      <InstagramIcon className="mx-auto h-10 w-10 text-gulf-500" />
-      <h2 className="mt-4 text-xl font-semibold text-ink-900">
+    <div className="rounded-2xl border border-dashed border-paper-300 bg-white/60 p-10 text-center">
+      <InstagramIcon className="mx-auto h-10 w-10 text-gold-500" />
+      <h2 className="mt-4 text-xl font-semibold text-navy-900">
         No photos synced yet
       </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-ink-800/65">
+      <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-navy-800/65">
         Run one of these from the project folder to pull your Instagram photos
         into the site, then commit and push:
       </p>
       <div className="mx-auto mt-5 max-w-md space-y-2 text-left">
-        <code className="block rounded-lg bg-ink-950 px-4 py-3 font-mono text-xs text-sand-100">
+        <code className="block rounded-lg bg-navy-950 px-4 py-3 font-mono text-xs text-paper-100">
           npm run sync:instagram
         </code>
-        <p className="text-center text-xs text-ink-800/45">
+        <p className="text-center text-xs text-navy-800/45">
           or, with no API setup at all
         </p>
-        <code className="block rounded-lg bg-ink-950 px-4 py-3 font-mono text-xs text-sand-100">
+        <code className="block rounded-lg bg-navy-950 px-4 py-3 font-mono text-xs text-paper-100">
           npm run import:export
         </code>
       </div>
-      <p className="mt-5 text-xs text-ink-800/50">
+      <p className="mt-5 text-xs text-navy-800/50">
         See the README for the two-minute setup on each.
       </p>
     </div>

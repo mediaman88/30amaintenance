@@ -8,8 +8,8 @@ type Status = "idle" | "sending" | "sent";
 type Errors = Record<string, string>;
 
 const field =
-  "w-full rounded-xl border border-sand-200 bg-white px-4 py-3 text-ink-900 placeholder:text-ink-800/35 transition-colors focus:border-gulf-500 focus:outline-none focus:ring-2 focus:ring-gulf-500/25";
-const label = "block text-sm font-medium text-ink-900";
+  "w-full rounded-xl border border-paper-200 bg-white px-4 py-3 text-navy-900 placeholder:text-navy-800/35 transition-colors focus:border-gold-500 focus:outline-none focus:ring-2 focus:ring-gold-500/25";
+const label = "block text-sm font-medium text-navy-900";
 
 export default function ContactForm() {
   const [status, setStatus] = useState<Status>("idle");
@@ -76,21 +76,21 @@ export default function ContactForm() {
 
   if (status === "sent") {
     return (
-      <div className="rounded-2xl bg-white p-10 text-center shadow-lift ring-1 ring-sand-200">
-        <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-gulf-50 text-gulf-600 ring-1 ring-gulf-100">
+      <div className="rounded-2xl bg-white p-10 text-center shadow-lift ring-1 ring-paper-200">
+        <div className="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full bg-gold-50 text-navy-700 ring-1 ring-gold-100">
           <CheckIcon className="h-7 w-7" />
         </div>
-        <h2 className="mt-5 text-xl font-semibold text-ink-900">
+        <h2 className="mt-5 text-xl font-semibold text-navy-900">
           Thanks — we got it.
         </h2>
-        <p className="mx-auto mt-3 max-w-sm text-pretty leading-relaxed text-ink-800/70">
+        <p className="mx-auto mt-3 max-w-sm text-pretty leading-relaxed text-navy-800/70">
           We&apos;ll be in touch within a business day or two. If it&apos;s
           urgent, calling is always faster.
         </p>
         <button
           type="button"
           onClick={() => setStatus("idle")}
-          className="mt-6 text-sm font-semibold text-gulf-700 underline underline-offset-4 transition-colors hover:text-gulf-500"
+          className="mt-6 text-sm font-semibold text-navy-800 underline underline-offset-4 transition-colors hover:text-gold-500"
         >
           Send another message
         </button>
@@ -102,12 +102,12 @@ export default function ContactForm() {
     <form
       onSubmit={onSubmit}
       noValidate
-      className="rounded-2xl bg-white p-7 shadow-lift ring-1 ring-sand-200 sm:p-9"
+      className="rounded-2xl bg-white p-7 shadow-lift ring-1 ring-paper-200 sm:p-9"
     >
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="name" className={label}>
-            Name <span className="text-gulf-600">*</span>
+            Name <span className="text-navy-700">*</span>
           </label>
           <input
             id="name"
@@ -136,7 +136,7 @@ export default function ContactForm() {
 
         <div className="sm:col-span-2">
           <label htmlFor="email" className={label}>
-            Email <span className="text-gulf-600">*</span>
+            Email <span className="text-navy-700">*</span>
           </label>
           <input
             id="email"
@@ -187,7 +187,7 @@ export default function ContactForm() {
 
         <div className="sm:col-span-2">
           <label htmlFor="message" className={label}>
-            Tell us about the project <span className="text-gulf-600">*</span>
+            Tell us about the project <span className="text-navy-700">*</span>
           </label>
           <textarea
             id="message"
@@ -212,13 +212,13 @@ export default function ContactForm() {
       {notice && (
         <p
           role="alert"
-          className="mt-6 rounded-xl bg-sun-400/12 px-4 py-3 text-sm leading-relaxed text-ink-900 ring-1 ring-sun-400/35"
+          className="mt-6 rounded-xl bg-gold-400/12 px-4 py-3 text-sm leading-relaxed text-navy-900 ring-1 ring-gold-400/35"
         >
           {notice.text}{" "}
           {notice.email && (
             <a
               href={`mailto:${notice.email}`}
-              className="font-semibold text-gulf-700 underline underline-offset-4"
+              className="font-semibold text-navy-800 underline underline-offset-4"
             >
               {notice.email}
             </a>
@@ -229,13 +229,13 @@ export default function ContactForm() {
       <button
         type="submit"
         disabled={status === "sending"}
-        className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-ink-900 px-8 py-4 text-base font-semibold text-sand-50 shadow-lift transition-all hover:bg-ink-800 hover:shadow-lift-lg active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
+        className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-full bg-navy-900 px-8 py-4 text-base font-semibold text-paper-50 shadow-lift transition-all hover:bg-navy-800 hover:shadow-lift-lg active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60 sm:w-auto"
       >
         {status === "sending" ? "Sending…" : "Send request"}
         {status !== "sending" && <ArrowIcon className="h-4 w-4" />}
       </button>
 
-      <p className="mt-4 text-xs leading-relaxed text-ink-800/50">
+      <p className="mt-4 text-xs leading-relaxed text-navy-800/50">
         We only use your details to reply about your project. No lists, no
         sharing.
       </p>

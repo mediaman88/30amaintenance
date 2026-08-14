@@ -103,7 +103,7 @@ export function Stars({
           stroke="currentColor"
           strokeWidth={1.6}
           strokeLinejoin="round"
-          style={{ color: "var(--color-sun-400)" }}
+          style={{ color: "var(--color-gold-400)" }}
         >
           <path d="m12 3.5 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" />
         </svg>

@@ -15,6 +15,14 @@ export const site = {
   description:
     "Remodeling, repairs, and year-round property maintenance for homes and vacation rentals along Scenic Highway 30A and South Walton, Florida.",
 
+  /**
+   * The real logo file. Save the logo into `public/` and put its path here,
+   * e.g. "/logo.png". Leave "" and components/Logo.tsx draws a stand-in built
+   * from the same navy ring / gold disc / "30A" lockup.
+   * A square PNG with a transparent background at 512×512 or larger is ideal.
+   */
+  logoSrc: "",
+
   // Used for canonical URLs, sitemap, and Open Graph tags.
   // Set NEXT_PUBLIC_SITE_URL in Vercel to your real domain and this follows it.
   url: process.env.NEXT_PUBLIC_SITE_URL || "https://30amaintenance.com", // TODO: confirm domain
