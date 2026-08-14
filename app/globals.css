@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@theme {
+  /* Coastal palette — deep gulf water, weathered sand, late-afternoon sun. */
+  --color-ink-950: #071a20;
+  --color-ink-900: #0c2831;
+  --color-ink-800: #123a46;
+  --color-ink-700: #1a4e5d;
+
+  --color-gulf-50: #eff9fa;
+  --color-gulf-100: #d6f0f3;
+  --color-gulf-200: #b0e2e8;
+  --color-gulf-400: #4bb6c4;
+  --color-gulf-500: #2b96a6;
+  --color-gulf-600: #1d7a89;
+  --color-gulf-700: #1a6270;
+
+  --color-sand-50: #fbf8f3;
+  --color-sand-100: #f5efe4;
+  --color-sand-200: #e9dfcd;
+  --color-sand-300: #d8c9ae;
+
+  --color-sun-400: #eab24f;
+  --color-sun-500: #dd9a2b;
+  --color-sun-600: #bd7d18;
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
+    Arial, sans-serif;
+  --font-display: ui-serif, Georgia, Cambria, "Times New Roman", serif;
+
+  --shadow-lift: 0 1px 2px rgb(7 26 32 / 0.06), 0 12px 28px -12px rgb(7 26 32 / 0.18);
+  --shadow-lift-lg: 0 2px 4px rgb(7 26 32 / 0.06), 0 24px 48px -20px rgb(7 26 32 / 0.28);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-sand-50);
+    color: var(--color-ink-900);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Visible focus for keyboard users, invisible for mouse users. */
+  :focus-visible {
+    outline: 2px solid var(--color-gulf-600);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  ::selection {
+    background-color: var(--color-gulf-200);
+  }
+}
+
+@layer components {
+  .container-page {
+    width: 100%;
+    margin-inline: auto;
+    max-width: 76rem;
+    padding-inline: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .container-page {
+      padding-inline: 2rem;
+    }
+  }
+}
+
+@layer utilities {
+  /* Fade-up on scroll. Disabled entirely under reduced-motion. */
+  .reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+      opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
