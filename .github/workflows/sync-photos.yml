@@ -85,7 +85,15 @@ jobs:
             fi
 
             echo "File ID: $FILE_ID"
-            gdown "$FILE_ID" -O export.zip
+            if ! gdown "$FILE_ID" -O export.zip; then
+              echo "::error::Google refused to serve that file. It's almost "\
+                   "always sharing: open the file in Drive, tap Share, and "\
+                   "change 'Restricted' to 'Anyone with the link'. The runner "\
+                   "isn't signed in as you, so a restricted file is invisible "\
+                   "to it. (A link ending in ?usp=drivesdk is usually still "\
+                   "restricted.)"
+              exit 1
+            fi
           else
             # Dropbox share links preview by default; dl=1 makes them download.
             URL="${ZIP_URL/dl=0/dl=1}"
