@@ -1,0 +1,168 @@
+name: Sync photos
+
+# Pulls Instagram photos into the site without needing a computer — you can
+# start this from GitHub in a phone browser. Two modes:
+#
+#   1. Paste a link to your Instagram export .zip  → imports from the export
+#   2. Leave the link blank                        → syncs via the Instagram API
+#                                                     (needs the IG_ACCESS_TOKEN secret)
+#
+# Either way the photos are resized, committed, and Vercel redeploys on its own.
+
+on:
+  workflow_dispatch:
+    inputs:
+      zip_url:
+        description: "Direct link to your Instagram export .zip (Google Drive or Dropbox is fine). Leave blank to use the Instagram API instead."
+        required: false
+        default: ""
+      max_width:
+        description: "Longest edge, in pixels"
+        required: false
+        default: "1600"
+      quality:
+        description: "JPEG quality, 1-100"
+        required: false
+        default: "80"
+      max_photos:
+        description: "Most photos to import (blank = all of them)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-photos
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download the export
+        if: inputs.zip_url != ''
+        env:
+          ZIP_URL: ${{ inputs.zip_url }}
+        run: |
+          set -euo pipefail
+          mkdir -p import
+
+          if [[ "$ZIP_URL" == *"drive.google.com"* ]]; then
+            # Drive puts a virus-scan interstitial in front of large files;
+            # gdown knows how to get past it. Pass the URL through untouched
+            # so gdown can parse whichever link format Drive handed over.
+            echo "Google Drive link detected"
+            pip install --quiet --upgrade gdown
+            gdown --fuzzy "$ZIP_URL" -O export.zip
+          else
+            # Dropbox share links preview by default; dl=1 makes them download.
+            URL="${ZIP_URL/dl=0/dl=1}"
+            echo "Downloading…"
+            curl -fL --retry 3 --retry-delay 5 "$URL" -o export.zip
+          fi
+
+          echo "Downloaded $(du -h export.zip | cut -f1)"
+          file export.zip
+
+          if ! unzip -tq export.zip; then
+            echo "::error::That file isn't a readable .zip. The link probably "\
+                 "pointed at a preview page rather than the file itself — "\
+                 "check that it's a direct download link and that anyone with "\
+                 "the link can access it."
+            exit 1
+          fi
+
+          unzip -q export.zip -d import
+          rm export.zip
+          echo "Unzipped $(find import -type f | wc -l) files"
+
+      - name: Import from the export
+        if: inputs.zip_url != ''
+        run: |
+          set -euo pipefail
+          ARGS="--max-width=${{ inputs.max_width }} --quality=${{ inputs.quality }}"
+          if [ -n "${{ inputs.max_photos }}" ]; then
+            ARGS="$ARGS --max=${{ inputs.max_photos }}"
+          fi
+          echo "Running: npm run import:export -- $ARGS"
+          npm run import:export -- $ARGS
+
+      - name: Sync from the Instagram API
+        if: inputs.zip_url == ''
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${IG_ACCESS_TOKEN:-}" ]; then
+            echo "::error::No export link was given and the IG_ACCESS_TOKEN "\
+                 "secret isn't set, so there's nothing to sync from. Either "\
+                 "paste a link to your export .zip when starting this, or add "\
+                 "the token under Settings → Secrets and variables → Actions."
+            exit 1
+          fi
+          npm run sync:instagram
+
+      - name: Check the result will fit
+        run: |
+          set -euo pipefail
+          SIZE_KB=$(du -sk public/gallery | cut -f1)
+          echo "Gallery is $((SIZE_KB / 1024)) MB"
+
+          # GitHub refuses any single file over 100MB.
+          BIG=$(find public/gallery -type f -size +100M)
+          if [ -n "$BIG" ]; then
+            echo "::error::These files are over GitHub's 100MB limit:"
+            echo "$BIG"
+            exit 1
+          fi
+
+          if [ "$SIZE_KB" -gt 512000 ]; then
+            echo "::warning::The gallery is over 500MB. Consider re-running "\
+                 "with a smaller max_width, a lower quality, or a max_photos cap."
+          fi
+
+      - name: Verify the site still builds
+        run: npm run build
+
+      - name: Commit the photos
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add public/gallery data/instagram.json
+
+          if git diff --cached --quiet; then
+            echo "No new photos — nothing to commit."
+            exit 0
+          fi
+
+          COUNT=$(node -p "require('./data/instagram.json').count")
+          git commit -m "Sync ${COUNT} photos from Instagram"
+          git push
+          echo "Pushed ${COUNT} photos. Vercel will redeploy automatically."
+
+      - name: Summary
+        if: always()
+        run: |
+          {
+            echo "### Photo sync"
+            if [ -f data/instagram.json ]; then
+              echo ""
+              echo "- Photos in gallery: **$(node -p "require('./data/instagram.json').count")**"
+              echo "- Gallery size: **$(du -sh public/gallery | cut -f1)**"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
