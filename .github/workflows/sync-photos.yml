@@ -120,6 +120,14 @@ jobs:
         if: inputs.zip_url != ''
         run: |
           set -euo pipefail
+
+          # An export import is a full rebuild, not an incremental sync: clear
+          # the gallery first so photos dropped from the export (or renamed by
+          # a changed import) don't linger as orphans the manifest never
+          # references. The API sync path is incremental and skips this.
+          find public/gallery -type f ! -name '.gitkeep' -delete
+          echo "Cleared the previous gallery"
+
           ARGS="--max-width=${{ inputs.max_width }} --quality=${{ inputs.quality }}"
           if [ -n "${{ inputs.max_photos }}" ]; then
             ARGS="$ARGS --max=${{ inputs.max_photos }}"

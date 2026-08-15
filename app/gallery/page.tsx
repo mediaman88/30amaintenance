@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import GalleryGrid from "@/components/GalleryGrid";
-import { categoryFor, getCategories, getPhotos, getSyncInfo } from "@/lib/gallery";
+import AlbumGallery from "@/components/AlbumGallery";
+import {
+  categoryForAlbum,
+  getAlbumCategories,
+  getAlbums,
+  getPhotos,
+  getSyncInfo,
+} from "@/lib/gallery";
 import { site } from "@/site.config";
 import { InstagramIcon } from "@/components/icons";
 
@@ -11,14 +17,15 @@ export const metadata: Metadata = {
 };
 
 export default function GalleryPage() {
-  const photos = getPhotos();
-  const categories = getCategories();
+  const albums = getAlbums();
+  const categories = getAlbumCategories();
+  const photoCount = getPhotos().length;
   const { syncedAt } = getSyncInfo();
 
   // Categories are derived from hashtags on the server so the client component
   // doesn't need the mapping tables.
   const categoryById = Object.fromEntries(
-    photos.map((photo) => [photo.id, categoryFor(photo)]),
+    albums.map((album) => [album.id, categoryForAlbum(album)]),
   );
 
   return (
@@ -30,8 +37,8 @@ export default function GalleryPage() {
               Our work
             </h1>
             <p className="mt-5 text-pretty text-lg leading-relaxed text-navy-800/70">
-              {photos.length > 0
-                ? `${photos.length} photos from real jobs across 30A — remodels, repairs, turnovers, and everything in between.`
+              {albums.length > 0
+                ? `${albums.length} projects, ${photoCount} photos — grouped exactly as we posted them, from remodels and turnovers to the small repairs in between.`
                 : "Photos from real jobs across 30A — remodels, repairs, turnovers, and everything in between."}
             </p>
             <a
@@ -48,14 +55,14 @@ export default function GalleryPage() {
       </section>
 
       <section className="container-page py-14 sm:py-16">
-        <GalleryGrid
-          photos={photos}
+        <AlbumGallery
+          albums={albums}
           categories={categories}
           categoryById={categoryById}
         />
 
         {syncedAt && (
-          <p className="mt-14 text-center text-xs text-navy-800/40">
+          <p className="mt-16 text-center text-xs text-navy-800/40">
             Last synced from Instagram{" "}
             <time dateTime={syncedAt}>
               {new Date(syncedAt).toLocaleDateString("en-US", {

@@ -16,10 +16,35 @@ export type Photo = {
   albumSize: number;
 };
 
+/** One Instagram post: its photos, in the order they were posted. */
+export type Album = {
+  id: string;
+  /** The Instagram caption, verbatim. */
+  caption: string;
+  /** Short heading derived from the caption — the first line or sentence. */
+  title: string;
+  /** Caption remainder once the title and hashtags are removed. May be "". */
+  body: string;
+  timestamp: string | null;
+  tags: string[];
+  photos: Photo[];
+};
+
+type ManifestAlbum = {
+  id: string;
+  caption: string;
+  timestamp: string | null;
+  tags: string[];
+  count: number;
+  cover: string;
+};
+
 type Manifest = {
   syncedAt: string | null;
   count: number;
   source: string;
+  posts?: number;
+  albums?: ManifestAlbum[];
   items: Photo[];
 };
 
@@ -139,4 +164,100 @@ export function displayCaption(photo: Photo): string {
     .replace(/#[\wÀ-ɏ]+/g, "")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
+}
+
+/**
+ * Split a caption into a short heading and the rest. Instagram captions
+ * usually lead with the gist and then run into detail and hashtags, so the
+ * first line (or sentence) makes a serviceable album title.
+ */
+function splitCaption(caption: string): { title: string; body: string } {
+  const clean = caption
+    .replace(/#[\wÀ-ɏ]+/g, "")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  if (!clean) return { title: "", body: "" };
+
+  const firstLine = clean.split("\n")[0].trim();
+  // A short first line is a headline; a long one is a paragraph, so cut it at
+  // the first sentence instead of putting 300 characters in a heading.
+  let title = firstLine;
+  if (title.length > 70) {
+    const sentence = title.split(/(?<=[.!?])\s/)[0];
+    title = sentence.length <= 90 ? sentence : `${title.slice(0, 67).trimEnd()}…`;
+  }
+
+  const body = clean.slice(title.length).trim();
+  return { title, body };
+}
+
+/** Every post, newest first, with its photos in their original order. */
+export function getAlbums(): Album[] {
+  const manifestAlbums = data.albums ?? [];
+  const photos = getPhotos();
+
+  // Group photos by the post they came from.
+  const byPost = new Map<string, Photo[]>();
+  for (const photo of photos) {
+    const key = photo.postId ?? "__ungrouped__";
+    if (!byPost.has(key)) byPost.set(key, []);
+    byPost.get(key)!.push(photo);
+  }
+  for (const list of byPost.values()) {
+    list.sort((a, b) => a.albumIndex - b.albumIndex);
+  }
+
+  // Prefer the manifest's own album list — it preserves post order and the
+  // post-level caption. Fall back to grouping alone for older manifests.
+  const source: { id: string; caption: string; timestamp: string | null; tags: string[] }[] =
+    manifestAlbums.length
+      ? manifestAlbums
+      : [...byPost.entries()].map(([id, list]) => ({
+          id,
+          caption: list[0]?.caption ?? "",
+          timestamp: list[0]?.timestamp ?? null,
+          tags: list[0]?.tags ?? [],
+        }));
+
+  return source
+    .map((album) => {
+      const { title, body } = splitCaption(album.caption ?? "");
+      return {
+        id: album.id,
+        caption: album.caption ?? "",
+        title,
+        body,
+        timestamp: album.timestamp,
+        tags: album.tags ?? [],
+        photos: byPost.get(album.id) ?? [],
+      };
+    })
+    .filter((album) => album.photos.length > 0);
+}
+
+export function hasAlbums(): boolean {
+  return (data.albums?.length ?? 0) > 0;
+}
+
+/** Category for a whole album, from its hashtags. */
+export function categoryForAlbum(album: Album): string | null {
+  for (const tag of album.tags) {
+    const category = TAG_TO_CATEGORY[tag];
+    if (category) return category;
+  }
+  return null;
+}
+
+/** Filter chips for the album view — only categories with enough albums. */
+export function getAlbumCategories(minCount = 2): string[] {
+  const counts = new Map<string, number>();
+  for (const album of getAlbums()) {
+    const category = categoryForAlbum(album);
+    if (category) counts.set(category, (counts.get(category) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .filter(([, n]) => n >= minCount)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name]) => name);
 }
