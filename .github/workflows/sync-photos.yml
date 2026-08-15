@@ -42,9 +42,9 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "22"
           cache: npm
@@ -62,11 +62,30 @@ jobs:
 
           if [[ "$ZIP_URL" == *"drive.google.com"* ]]; then
             # Drive puts a virus-scan interstitial in front of large files;
-            # gdown knows how to get past it. Pass the URL through untouched
-            # so gdown can parse whichever link format Drive handed over.
+            # gdown knows how to get past it.
             echo "Google Drive link detected"
-            pip install --quiet --upgrade gdown
-            gdown --fuzzy "$ZIP_URL" -O export.zip
+
+            command -v gdown >/dev/null 2>&1 || pip install --upgrade gdown \
+              || pip install --break-system-packages --upgrade gdown
+            gdown --version || true
+
+            # Pull the file ID out of whichever link format Drive produced and
+            # pass the bare ID. gdown's flags for URL parsing have changed
+            # between major versions (v5 dropped --fuzzy), but a plain ID has
+            # always been accepted.
+            FILE_ID=$(printf '%s' "$ZIP_URL" | grep -oP '(?<=/d/)[a-zA-Z0-9_-]+' || true)
+            if [ -z "$FILE_ID" ]; then
+              FILE_ID=$(printf '%s' "$ZIP_URL" | grep -oP '(?<=[?&]id=)[a-zA-Z0-9_-]+' || true)
+            fi
+            if [ -z "$FILE_ID" ]; then
+              echo "::error::Couldn't find a file ID in that Drive link. Use the "\
+                   "link from Drive's Share → Copy link, which looks like "\
+                   "https://drive.google.com/file/d/FILE_ID/view"
+              exit 1
+            fi
+
+            echo "File ID: $FILE_ID"
+            gdown "$FILE_ID" -O export.zip
           else
             # Dropbox share links preview by default; dl=1 makes them download.
             URL="${ZIP_URL/dl=0/dl=1}"
