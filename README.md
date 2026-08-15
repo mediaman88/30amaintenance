@@ -113,6 +113,25 @@ The importer handles carousel posts, pulls captions and post dates out of the
 export's JSON, and fixes the mangled emoji encoding Instagram's exports are
 known for.
 
+**About the size.** A full export is typically hundreds of megabytes, but very
+little of that should end up in the repo — most of it is video and
+camera-resolution originals. The importer resizes every photo to 1600px on its
+longest edge, re-encodes it, skips videos, profile pictures and thumbnails, and
+reports what it saved. A 500MB export usually lands somewhere in the tens of
+megabytes, which is a sane size to commit and much faster to serve.
+
+Tune it if you need to:
+
+```bash
+npm run import:export -- --max-width=2000   # sharper, larger files
+npm run import:export -- --quality=70       # smaller files
+npm run import:export -- --max=150          # newest 150 photos only
+npm run import:export -- --dry-run          # report, write nothing
+```
+
+GitHub rejects any single file over 100MB, so don't disable optimisation
+(`--no-optimize`) unless you know the originals are already web-sized.
+
 ### Re-running
 
 Both scripts are safe to re-run. `sync:instagram` skips photos it already has,
