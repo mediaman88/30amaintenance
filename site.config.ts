@@ -30,9 +30,9 @@ export const site = {
   contact: {
     phone: "(850) 960-2594",
     phoneHref: "tel:+18509602594",
-    email: "", // TODO: real email — leave "" and the site shows the phone only
+    email: "30a.maintenance@gmail.com",
     // Where the contact form sends to. Falls back to contact.email.
-    formRecipient: "", // TODO
+    formRecipient: "30a.maintenance@gmail.com",
   },
 
   social: {
@@ -86,9 +86,7 @@ export const site = {
 
   hours: {
     weekdays: "Mon–Fri, 8:00am – 5:00pm",
-    // TODO: confirm the Saturday closing time — the Google listing shows an
-    // 8:00am open but the close time wasn't visible.
-    saturday: "Sat, from 8:00am",
+    saturday: "Sat, 8:00am – 5:00pm",
     sunday: "Sun, closed",
     // Shown in the "urgent" callout. Set to "" to hide that callout.
     emergencyNote: "Rental turnover emergency? Call and we'll work you in.",

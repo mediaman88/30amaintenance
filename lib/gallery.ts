@@ -167,28 +167,80 @@ export function displayCaption(photo: Photo): string {
 }
 
 /**
- * Split a caption into a short heading and the rest. Instagram captions
- * usually lead with the gist and then run into detail and hashtags, so the
- * first line (or sentence) makes a serviceable album title.
+ * Instagram captions here lean on strings of exclamation marks ("Porch
+ * enclosure!!!!"). That reads as shouting on a business site, so runs of them
+ * become a single full stop. Applied at display time only — the manifest keeps
+ * the caption exactly as it was posted.
+ */
+function calmPunctuation(text: string): string {
+  return (
+    text
+      // "Cabinets upgrade !!!!" → "Cabinets upgrade."
+      .replace(/\s*!+/g, ".")
+      // Don't leave "done.." behind where the text already ended in a stop.
+      .replace(/\.{2,}/g, ".")
+      // A stray space before the stop, from "word ." patterns.
+      .replace(/\s+\./g, ".")
+      .replace(/[ \t]{2,}/g, " ")
+  );
+}
+
+/**
+ * Split a caption into a heading and the rest. Instagram captions usually lead
+ * with the gist and then run into detail, so the first line makes a good album
+ * title.
  */
 function splitCaption(caption: string): { title: string; body: string } {
-  const clean = caption
-    .replace(/#[\wÀ-ɏ]+/g, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+  const clean = calmPunctuation(
+    caption.replace(/#[\wÀ-ɏ]+/g, "").replace(/\n{3,}/g, "\n\n"),
+  ).trim();
 
   if (!clean) return { title: "", body: "" };
 
-  const firstLine = clean.split("\n")[0].trim();
-  // A short first line is a headline; a long one is a paragraph, so cut it at
-  // the first sentence instead of putting 300 characters in a heading.
-  let title = firstLine;
-  if (title.length > 70) {
-    const sentence = title.split(/(?<=[.!?])\s/)[0];
-    title = sentence.length <= 90 ? sentence : `${title.slice(0, 67).trimEnd()}…`;
+  const MAX_TITLE = 140;
+  const lines = clean.split("\n");
+  const firstLine = lines[0].trim();
+  const remainder = lines.slice(1).join("\n").trim();
+
+  // Headings wrap, so length alone is no reason to shorten one. Nothing is
+  // ever dropped: whatever doesn't belong in the heading moves into the body,
+  // so the caption always reads in full.
+  if (firstLine.length <= MAX_TITLE) {
+    return { title: firstLine, body: remainder };
   }
 
-  const body = clean.slice(title.length).trim();
+  // Take whole sentences while they fit — one very short opener ("I know.")
+  // makes a poor title on its own, so keep going until there's enough of it.
+  const sentences = firstLine.split(/(?<=[.?])\s+/);
+  let title = "";
+  let taken = 0;
+  for (const sentence of sentences) {
+    const candidate = title ? `${title} ${sentence}` : sentence;
+    if (candidate.length > MAX_TITLE && title) break;
+    title = candidate;
+    taken += sentence.length + 1;
+    if (title.length > MAX_TITLE) break;
+  }
+
+  // A single run-on sentence longer than the limit. Break at a clause boundary
+  // where there is one — cutting on a comma keeps phrases (and names like
+  // "30A Maintenance") intact, where a bare word break would split them.
+  if (title.length > MAX_TITLE) {
+    const window = title.slice(0, MAX_TITLE);
+    const clause = Math.max(
+      window.lastIndexOf(", "),
+      window.lastIndexOf("; "),
+      window.lastIndexOf(": "),
+    );
+    const word = window.lastIndexOf(" ");
+    const cut = clause > MAX_TITLE * 0.6 ? clause : word > 40 ? word : MAX_TITLE;
+    taken = cut;
+    title = title.slice(0, taken).replace(/[\s,;:]+$/, "");
+  }
+
+  const overflow = firstLine.slice(taken).trim();
+  const body = [overflow, remainder].filter(Boolean).join("\n").trim();
+
   return { title, body };
 }
 
